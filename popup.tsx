@@ -18,33 +18,6 @@ function IndexPopup() {
     return tab
   }
 
-  async function approveAllVercelTabs() {
-    chrome.tabs.query({}, function (tabs) {
-      const authorizeTabs = tabs.filter((tab) =>
-        tab.url.includes("https://vercel.com/git/authorize")
-      )
-
-      authorizeTabs.forEach((tab) => {
-        chrome.scripting.executeScript({
-          target: { tabId: tab.id },
-          func: () => {
-            const authorizeButton = document.querySelector(
-              "div.geist-wrapper > div > div > button"
-            ) as HTMLButtonElement
-            authorizeButton.click()
-            setTimeout(() => {
-              window.close()
-            })
-          }
-        })
-      })
-    })
-
-    if (returnId) {
-      chrome.tabs.update(returnId, { active: true })
-    }
-  }
-
   return (
     <div style={{ width: "720px", fontFamily: "monospace", padding: "12px" }}>
       <h1 style={{ margin: "0" }}>vercel-accept-all</h1>
@@ -54,7 +27,9 @@ function IndexPopup() {
         <button onClick={() => handleClick("openTabs")}>
           Open all authorization tabs
         </button>
-        <button onClick={() => approveAllVercelTabs()}>
+        <button onClick={() => {
+          chrome.runtime.sendMessage({ command: "approveAllVercelTabs" })
+        }}>
           Approve all Vercel tabs
         </button>
       </div>
